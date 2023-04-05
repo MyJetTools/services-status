@@ -1,4 +1,4 @@
-use std::sync::Arc;
+use std::{sync::Arc, time::Duration};
 
 use flurl::FlUrlResponse;
 
@@ -6,7 +6,7 @@ use serde_derive::{Deserialize, Serialize};
 
 use rust_extensions::{MyTimerTick, StopWatch};
 
-use crate::app_ctx::AppContext;
+use crate::{app_ctx::AppContext, settings::ServiceSettings};
 
 pub struct ServicesPinger {
     app: Arc<AppContext>,
@@ -30,53 +30,10 @@ impl MyTimerTick for ServicesPinger {
 
         for (domain, services) in &settings_model.services {
             for service in services {
-                let mut sw = StopWatch::new();
-                sw.start();
-                let result = flurl::FlUrl::new(service.url.as_str()).get().await;
-
-                match result {
-                    Ok(response) => match get_ok_result(response).await {
-                        Ok(model) => {
-                            sw.pause();
-                            self.app
-                                .services_list
-                                .update_ok(
-                                    domain.as_str(),
-                                    service.id.as_str(),
-                                    model.name,
-                                    model.version,
-                                    model.env_info,
-                                    model.started,
-                                    sw.duration(),
-                                )
-                                .await;
-                        }
-                        Err(err) => {
-                            sw.pause();
-                            self.app
-                                .services_list
-                                .update_error(
-                                    domain.as_str(),
-                                    service.id.as_str(),
-                                    err,
-                                    sw.duration(),
-                                )
-                                .await;
-                        }
-                    },
-                    Err(err) => {
-                        sw.pause();
-                        self.app
-                            .services_list
-                            .update_error(
-                                domain.as_str(),
-                                service.id.as_str(),
-                                format!("{:?}", err),
-                                sw.duration(),
-                            )
-                            .await;
-                    }
-                }
+                let app = self.app.clone();
+                let domain = domain.clone();
+                let service = service.clone();
+                tokio::spawn(ping_service(app, domain, service));
             }
         }
     }
@@ -102,12 +59,56 @@ async fn get_ok_result(mut result: FlUrlResponse) -> Result<ServiceApiIsAliveMod
 
     if let Err(err) = model {
         return Err(format!(
-            "Can not deserialize into api/islive model: {:?}",
+            "Can not deserialize into api/isalive model: {:?}",
             err
         ));
     }
 
     Ok(model.unwrap())
+}
+
+async fn ping_service(app: Arc<AppContext>, domain: String, service: ServiceSettings) {
+    let mut sw = StopWatch::new();
+    sw.start();
+    let result = flurl::FlUrl::new_with_timeout(service.url.as_str(), Duration::from_secs(2))
+        .get()
+        .await;
+
+    match result {
+        Ok(response) => match get_ok_result(response).await {
+            Ok(model) => {
+                sw.pause();
+                app.services_list
+                    .update_ok(
+                        domain.as_str(),
+                        service.id.as_str(),
+                        model.name,
+                        model.version,
+                        model.env_info,
+                        model.started,
+                        sw.duration(),
+                    )
+                    .await;
+            }
+            Err(err) => {
+                sw.pause();
+                app.services_list
+                    .update_error(domain.as_str(), service.id.as_str(), err, sw.duration())
+                    .await;
+            }
+        },
+        Err(err) => {
+            sw.pause();
+            app.services_list
+                .update_error(
+                    domain.as_str(),
+                    service.id.as_str(),
+                    format!("{:?}", err),
+                    sw.duration(),
+                )
+                .await;
+        }
+    }
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
