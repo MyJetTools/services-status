@@ -57,12 +57,14 @@ async fn get_ok_result(mut result: FlUrlResponse) -> Result<ServiceApiIsAliveMod
 
     let model = serde_json::from_slice::<ServiceApiIsAliveModel>(body);
 
+    //cSpell: disable
     if let Err(err) = model {
         return Err(format!(
             "Can not deserialize into api/isalive model: {:?}",
             err
         ));
     }
+    //cSpell: enable
 
     Ok(model.unwrap())
 }
