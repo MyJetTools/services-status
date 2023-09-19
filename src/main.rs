@@ -55,4 +55,14 @@ async fn main() {
     timer_30s.start(app.app_states.clone(), my_logger::LOGGER.clone());
 
     app.app_states.wait_until_shutdown().await;
+
+    if let Some(telegram_settings) = app.settings_reader.get_telegram_settings().await {
+        let env_info = app.settings_reader.get_env_info().await;
+        telegram_api::send_message(
+            &telegram_settings,
+            &env_info,
+            "Service status app is shutting down".into(),
+        )
+        .await;
+    }
 }

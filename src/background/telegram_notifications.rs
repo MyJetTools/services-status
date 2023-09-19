@@ -57,10 +57,17 @@ impl MyTimerTick for TelegramNotification {
                     .await;
                 } else {
                     if let Some(_) = errs.remove(&service.app_name) {
-                        println!(
-                            "Service {}:{} is ok now",
-                            service.app_name, service.app_version
-                        );
+                        let env_info = self.app.settings_reader.get_env_info().await;
+                        crate::telegram_api::send_message(
+                            &telegram_settings,
+                            env_info.as_str(),
+                            format!(
+                                "Service {}:{} is ok now",
+                                service.app_name, service.app_version
+                            )
+                            .as_str(),
+                        )
+                        .await;
                     }
                 }
             }
