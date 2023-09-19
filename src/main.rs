@@ -27,7 +27,7 @@ async fn main() {
         telegram_api::send_message(
             &telegram_settings,
             &env_info,
-            "Service status app started".into(),
+            "🆙Service status app started".into(),
         )
         .await;
     } else {
@@ -61,7 +61,7 @@ async fn main() {
         telegram_api::send_message(
             &telegram_settings,
             &env_info,
-            "Service status app is shutting down".into(),
+            "☠️Service status app is shutting down".into(),
         )
         .await;
     }
