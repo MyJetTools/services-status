@@ -4,6 +4,8 @@ use serde_derive::{Deserialize, Serialize};
 
 #[derive(my_settings_reader::SettingsModel, Serialize, Deserialize, Debug, Clone)]
 pub struct SettingsModel {
+    #[serde(rename = "EnvInfo")]
+    pub env_info: String,
     #[serde(rename = "Services")]
     pub services: BTreeMap<String, Vec<ServiceSettings>>,
     #[serde(rename = "Telegram")]
@@ -14,6 +16,11 @@ impl SettingsReader {
     pub async fn get_telegram_settings(&self) -> Option<TelegramSettings> {
         let read_access = self.settings.read().await;
         read_access.telegram.clone()
+    }
+
+    pub async fn get_env_info(&self) -> String {
+        let read_access = self.settings.read().await;
+        read_access.env_info.clone()
     }
 }
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -57,6 +64,7 @@ mod tests {
                 message_thread_id: 13,
             }
             .into(),
+            env_info: "EnvInfo".to_string(),
         };
 
         let result = serde_yaml::to_string(&settings).unwrap();

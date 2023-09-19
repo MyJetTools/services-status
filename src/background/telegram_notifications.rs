@@ -34,10 +34,12 @@ impl MyTimerTick for TelegramNotification {
                 let service_ok_duration = now.duration_since(service.last_ok_ping);
 
                 if service_ok_duration.as_positive_or_zero().as_secs() > 60 {
+                    let env_info = self.app.settings_reader.get_env_info().await;
                     crate::telegram_api::send_message(
                         &telegram_settings,
+                        env_info.as_str(),
                         format!(
-                            "Service {}:{} is not ok for {} seconds",
+                            " Service {}:{} is not ok for {} seconds",
                             service.app_name,
                             service.app_version,
                             service_ok_duration.as_positive_or_zero().as_secs()
