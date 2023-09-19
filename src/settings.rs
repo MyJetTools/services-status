@@ -6,7 +6,7 @@ use serde_derive::{Deserialize, Serialize};
 pub struct SettingsModel {
     #[serde(rename = "Services")]
     pub services: BTreeMap<String, Vec<ServiceSettings>>,
-
+    #[serde(rename = "Telegram")]
     pub telegram: Option<TelegramSettings>,
 }
 
@@ -50,7 +50,11 @@ mod tests {
         );
         let settings = SettingsModel {
             services,
-            telegram: None,
+            telegram: TelegramSettings {
+                api_key: "xxx".to_string(),
+                chat_id: 12,
+            }
+            .into(),
         };
 
         let result = serde_yaml::to_string(&settings).unwrap();
