@@ -6,7 +6,6 @@ on:
 env:
   IMAGE_NAME: myjettools/services-status
 
-
 jobs:
   build:
     runs-on: ubuntu-22.04
