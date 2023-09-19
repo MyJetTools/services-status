@@ -10,10 +10,10 @@ pub enum MessageType {
 impl MessageType {
     pub fn as_str(&self) -> &str {
         match self {
-            MessageType::Up => "🆙",
-            MessageType::Down => "☠️",
-            MessageType::ServiceIsDown => "🟥👎🏿",
-            MessageType::ServiceIsUp => "👌",
+            MessageType::Up => "☑",
+            MessageType::Down => "◾",
+            MessageType::ServiceIsDown => "☠️🟥🚨",
+            MessageType::ServiceIsUp => "👌👌👌",
         }
     }
 }
