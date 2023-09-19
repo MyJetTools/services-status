@@ -47,7 +47,7 @@ impl MyTimerTick for TelegramNotification {
                         &telegram_settings,
                         env_info.as_str(),
                         format!(
-                            "⚠️Service {}:{} is not ok for {} seconds",
+                            "🟥Service {}:{} is not ok for {} seconds",
                             service.app_name,
                             service.app_version,
                             service_ok_duration.as_positive_or_zero().as_secs()
