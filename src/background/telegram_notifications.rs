@@ -1,16 +1,21 @@
-use std::sync::Arc;
+use std::{collections::HashMap, sync::Arc};
 
 use rust_extensions::{date_time::DateTimeAsMicroseconds, MyTimerTick};
+use tokio::sync::Mutex;
 
 use crate::app_ctx::AppContext;
 
 pub struct TelegramNotification {
     app: Arc<AppContext>,
+    errs: Mutex<HashMap<String, ()>>,
 }
 
 impl TelegramNotification {
     pub fn new(app: Arc<AppContext>) -> Self {
-        Self { app }
+        Self {
+            app,
+            errs: Mutex::new(HashMap::new()),
+        }
     }
 }
 
@@ -25,6 +30,8 @@ impl MyTimerTick for TelegramNotification {
 
         let telegram_settings = settings.unwrap();
 
+        let mut errs = self.errs.lock().await;
+
         let snapshot = self.app.services_list.get_snapshot().await;
 
         let now = DateTimeAsMicroseconds::now();
@@ -35,6 +42,7 @@ impl MyTimerTick for TelegramNotification {
 
                 if service_ok_duration.as_positive_or_zero().as_secs() > 60 {
                     let env_info = self.app.settings_reader.get_env_info().await;
+                    errs.insert(service.app_name.clone(), ());
                     crate::telegram_api::send_message(
                         &telegram_settings,
                         env_info.as_str(),
@@ -47,6 +55,13 @@ impl MyTimerTick for TelegramNotification {
                         .as_str(),
                     )
                     .await;
+                } else {
+                    if let Some(_) = errs.remove(&service.app_name) {
+                        println!(
+                            "Service {}:{} is ok now",
+                            service.app_name, service.app_version
+                        );
+                    }
                 }
             }
         }
