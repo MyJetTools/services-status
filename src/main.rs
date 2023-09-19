@@ -23,7 +23,11 @@ async fn main() {
     let mut http_server = http::start_up::setup_server(&app, 8000);
 
     if let Some(telegram_settings) = app.settings_reader.get_telegram_settings().await {
-        telegram_api::send_message(&telegram_settings, "Service status app started".into()).await;
+        telegram_api::send_message_to_telegram(
+            &telegram_settings,
+            "Service status app started".into(),
+        )
+        .await;
     } else {
         println!("telegram_api_key is not setup. Messages are not going to be sent");
     }

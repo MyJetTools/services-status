@@ -1,29 +1,26 @@
+//pub URL: &'static str = "https://api.telegram.org/bot{api_key}/sendMessage?chat_id={chat_id}&text={text}";
+
+use rust_extensions::StrOrString;
+use teloxide::{
+    requests::{Request, Requester},
+    types::{ChatId, Recipient},
+    Bot,
+};
+
 use crate::settings::TelegramSettings;
 
-// Define a function to send a message using the Telegram Bot API
-pub async fn send_message(telegram_settings: &TelegramSettings, text: &str) {
-    // Set the API endpoint and parameters
-    let url = format!(
-        "https://api.telegram.org/bot{}/sendMessage",
-        telegram_settings.api_key
-    );
-    let params = [
-        ("chat_id", telegram_settings.chat_id.to_string()),
-        (
-            "message_thread_id",
-            telegram_settings.message_thread_id.to_string(),
-        ),
-        ("text", text.to_string()),
-    ];
+pub async fn send_message_to_telegram(
+    telegram_settings: &TelegramSettings,
+    message: StrOrString<'static>,
+) {
+    let bot = Bot::new(telegram_settings.api_key.as_str());
 
-    // Create a client and send a POST request to the API
-    let client = reqwest::Client::new();
-    let response = client.post(&url).form(&params).send().await;
+    let chat_id = ChatId(telegram_settings.chat_id);
 
-    println!("{:?}", response);
+    let mut request = bot.send_message(Recipient::Id(chat_id), message.as_str());
+    request.message_thread_id = telegram_settings.message_thread_id.into();
 
-    // Parse the JSON response
-    //let telegram_response: TelegramResponse = response.json().await?;
+    let result = request.send().await;
 
-    // Return the telegram response
+    println!("Send telegram result: {:?}", result);
 }

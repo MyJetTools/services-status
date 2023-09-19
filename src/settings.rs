@@ -26,7 +26,7 @@ pub struct ServiceSettings {
 pub struct TelegramSettings {
     pub api_key: String,
     pub chat_id: i64,
-    pub message_thread_id: i64,
+    pub message_thread_id: i32,
 }
 
 #[cfg(test)]
