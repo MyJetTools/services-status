@@ -5,7 +5,8 @@ interface IStatusContract {
 interface IServiceStatus {
     id: String;
     name: String;
-    version: String
+    version: String;
+    compiledAt: String,
     url: String,
     lastOk: number,
     lastError: String,

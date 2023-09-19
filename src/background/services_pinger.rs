@@ -86,6 +86,7 @@ async fn ping_service(app: Arc<AppContext>, domain: String, service: ServiceSett
                         service.id.as_str(),
                         model.name,
                         model.version,
+                        model.compiled,
                         model.env_info,
                         model.started,
                         sw.duration(),
@@ -118,5 +119,6 @@ pub struct ServiceApiIsAliveModel {
     pub name: String,
     pub version: String,
     pub env_info: Option<String>,
+    pub compiled: Option<String>,
     pub started: Option<i64>,
 }

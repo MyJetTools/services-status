@@ -31,7 +31,7 @@ class HtmlMain {
                     ok += '<tr style="background:red">' +
                         '<td>' + service.id + '</td>' +
                         '<td>' + service.name + '</td>' +
-                        '<td>' + service.version + '</td>' +
+                        '<td><div>' + service.version + '</div><div style:"font-size:12px">' + service.compiledAt + '</div></td>' +
                         '<td><div>' + service.url + '</div><div> Started: ' + started + '</div></td>' +
                         '<td>' + service.envInfo + '</td>' +
                         '<td>' + service.lastOk + ' sec ago</td>' +

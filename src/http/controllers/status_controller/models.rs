@@ -36,6 +36,8 @@ pub struct ServiceStatus {
     pub name: String,
     pub url: String,
     pub version: String,
+    #[serde(rename = "compiledAt")]
+    pub compiled_at: String,
     #[serde(rename = "lastOk")]
     pub last_ok: usize,
     #[serde(rename = "lastError")]
@@ -56,6 +58,7 @@ impl ServiceStatus {
             name: src.app_name,
             version: src.app_version,
             url: src.url,
+            compiled_at: src.compiled.unwrap_or_else(|| "".to_string()),
             last_ok: now
                 .duration_since(src.last_ok_ping)
                 .as_positive_or_zero()

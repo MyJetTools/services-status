@@ -1,8 +1,8 @@
 use std::{net::SocketAddr, sync::Arc};
 
+use my_http_server::controllers::swagger::SwaggerMiddleware;
 use my_http_server::MyHttpServer;
 use my_http_server::StaticFilesMiddleware;
-use my_http_server_controllers::swagger::SwaggerMiddleware;
 
 use crate::app_ctx::AppContext;
 

@@ -58,6 +58,7 @@ impl ServicesList {
         id: &str,
         name: String,
         version: String,
+        compiled: Option<String>,
         env_info: Option<String>,
         started: Option<i64>,
         last_ping_duration: Duration,
@@ -73,6 +74,7 @@ impl ServicesList {
                 item.last_ping_duration = last_ping_duration;
                 item.env_info = env_info;
                 item.started = started;
+                item.compiled = compiled;
             }
         }
     }
