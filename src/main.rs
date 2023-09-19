@@ -1,6 +1,6 @@
 use std::{sync::Arc, time::Duration};
 
-use background::ServicesPinger;
+use background::{ServicesPinger, TelegramNotification};
 use rust_extensions::MyTimer;
 
 mod app_ctx;
@@ -38,6 +38,15 @@ async fn main() {
     );
 
     timer_3s.start(app.app_states.clone(), my_logger::LOGGER.clone());
+
+    let mut timer_30s = MyTimer::new(Duration::from_secs(30));
+
+    timer_30s.register_timer(
+        "Telegram_pinger",
+        Arc::new(TelegramNotification::new(app.clone())),
+    );
+
+    timer_30s.start(app.app_states.clone(), my_logger::LOGGER.clone());
 
     app.app_states.wait_until_shutdown().await;
 }
