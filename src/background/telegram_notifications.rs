@@ -3,7 +3,7 @@ use std::{collections::HashMap, sync::Arc};
 use rust_extensions::{date_time::DateTimeAsMicroseconds, MyTimerTick};
 use tokio::sync::Mutex;
 
-use crate::app_ctx::AppContext;
+use crate::{app_ctx::AppContext, telegram_api::MessageType};
 
 pub struct TelegramNotification {
     app: Arc<AppContext>,
@@ -46,8 +46,9 @@ impl MyTimerTick for TelegramNotification {
                     crate::telegram_api::send_message(
                         &telegram_settings,
                         env_info.as_str(),
+                        MessageType::ServiceIsDown,
                         format!(
-                            "🟥👎🏿Service {}:{} is not ok for {} seconds",
+                            "Service {}:{} is not ok for {} seconds",
                             service.app_name,
                             service.app_version,
                             service_ok_duration.as_positive_or_zero().as_secs()
@@ -61,8 +62,9 @@ impl MyTimerTick for TelegramNotification {
                         crate::telegram_api::send_message(
                             &telegram_settings,
                             env_info.as_str(),
+                            MessageType::ServiceIsUp,
                             format!(
-                                "👌Service {}:{} is ok now",
+                                "Service {}:{} is ok now",
                                 service.app_name, service.app_version
                             )
                             .as_str(),

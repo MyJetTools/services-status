@@ -2,6 +2,7 @@ use std::{sync::Arc, time::Duration};
 
 use background::{ServicesPinger, TelegramNotification};
 use rust_extensions::MyTimer;
+use telegram_api::MessageType;
 
 mod app_ctx;
 mod background;
@@ -27,7 +28,8 @@ async fn main() {
         telegram_api::send_message(
             &telegram_settings,
             &env_info,
-            "🆙Service status app started".into(),
+            MessageType::Up,
+            "Service status app started".into(),
         )
         .await;
     } else {
@@ -61,7 +63,8 @@ async fn main() {
         telegram_api::send_message(
             &telegram_settings,
             &env_info,
-            "☠️Service status app is shutting down".into(),
+            MessageType::Down,
+            "Service status app is shutting down".into(),
         )
         .await;
     }

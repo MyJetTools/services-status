@@ -1,7 +1,30 @@
 use crate::settings::TelegramSettings;
 
+pub enum MessageType {
+    Up,
+    Down,
+    ServiceIsDown,
+    ServiceIsUp,
+}
+
+impl MessageType {
+    pub fn as_str(&self) -> &str {
+        match self {
+            MessageType::Up => "🆙",
+            MessageType::Down => "☠️",
+            MessageType::ServiceIsDown => "🟥👎🏿",
+            MessageType::ServiceIsUp => "👌",
+        }
+    }
+}
+
 // Define a function to send a message using the Telegram Bot API
-pub async fn send_message(telegram_settings: &TelegramSettings, env_info: &str, text: &str) {
+pub async fn send_message(
+    telegram_settings: &TelegramSettings,
+    env_info: &str,
+    message_type: MessageType,
+    text: &str,
+) {
     // Set the API endpoint and parameters
     let url = format!(
         "https://api.telegram.org/bot{}/sendMessage",
@@ -13,7 +36,10 @@ pub async fn send_message(telegram_settings: &TelegramSettings, env_info: &str, 
             "message_thread_id",
             telegram_settings.message_thread_id.to_string(),
         ),
-        ("text", format!("EnvInfo:{env_info}. {text}")),
+        (
+            "text",
+            format!("{}EnvInfo:{env_info}. {text}", message_type.as_str()),
+        ),
     ];
 
     // Create a client and send a POST request to the API
