@@ -23,7 +23,7 @@ var HtmlMain = /** @class */ (function () {
                 if (service.started) {
                     started = new Date(service.started / 1000).toLocaleString();
                 }
-                var version = '<td><div>' + service.version + '</div><div style:"font-size:12px">' + service.compiledAt + '</div></td>';
+                var version = '<td><div>' + service.version + '</div><div style:"font-size:8px">' + service.compiledAt + '</div></td>';
                 if (service.lastOk >= 5 || service.lastError) {
                     ok += '<tr style="background:red">' +
                         '<td>' + service.id + '</td>' +
