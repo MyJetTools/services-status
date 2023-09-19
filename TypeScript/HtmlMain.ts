@@ -27,7 +27,7 @@ class HtmlMain {
                     started = new Date(service.started / 1000).toLocaleString();
                 }
 
-                let version = '<td><div>' + service.version + '</div><div style:"font-size:8px">' + service.compiledAt + '</div></td>';
+                let version = '<td><div>' + service.version + '</div><div style="font-size:10px">' + service.compiledAt + '</div></td>';
 
                 if (service.lastOk >= 5 || service.lastError) {
                     ok += '<tr style="background:red">' +
