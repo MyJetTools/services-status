@@ -26,6 +26,7 @@ pub struct ServiceSettings {
 pub struct TelegramSettings {
     pub api_key: String,
     pub chat_id: i64,
+    pub message_thread_id: i64,
 }
 
 #[cfg(test)]
@@ -53,6 +54,7 @@ mod tests {
             telegram: TelegramSettings {
                 api_key: "xxx".to_string(),
                 chat_id: 12,
+                message_thread_id: 13,
             }
             .into(),
         };

@@ -29,7 +29,7 @@ serde = "*"
 serde_derive = "*"
 serde_yaml = "*"
 serde_json = "*"
-
+reqwest = "*"
 signal-hook = "*"
 async-trait = "*"
 uuid = { version = "*", features = ["serde", "v4"] }
