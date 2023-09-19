@@ -6,12 +6,26 @@ use serde_derive::{Deserialize, Serialize};
 pub struct SettingsModel {
     #[serde(rename = "Services")]
     pub services: BTreeMap<String, Vec<ServiceSettings>>,
+
+    pub telegram: Option<TelegramSettings>,
 }
 
+impl SettingsReader {
+    pub async fn get_telegram_settings(&self) -> Option<TelegramSettings> {
+        let read_access = self.settings.read().await;
+        read_access.telegram.clone()
+    }
+}
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ServiceSettings {
     pub id: String,
     pub url: String,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct TelegramSettings {
+    pub api_key: String,
+    pub chat_id: i64,
 }
 
 #[cfg(test)]
@@ -34,7 +48,10 @@ mod tests {
                 },
             ],
         );
-        let settings = SettingsModel { services };
+        let settings = SettingsModel {
+            services,
+            telegram: None,
+        };
 
         let result = serde_yaml::to_string(&settings).unwrap();
 
