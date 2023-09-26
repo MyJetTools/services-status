@@ -48,7 +48,8 @@ impl MyTimerTick for TelegramNotification {
                         env_info.as_str(),
                         MessageType::ServiceIsDown,
                         format!(
-                            "Service {}:{} is not ok for {} seconds",
+                            "[{}]. Service {}:{} is not ok for {} seconds",
+                            service.id,
                             service.app_name,
                             service.app_version,
                             service_ok_duration.as_positive_or_zero().as_secs()
