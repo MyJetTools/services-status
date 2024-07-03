@@ -1,6 +1,6 @@
 use std::{sync::Arc, time::Duration};
 
-use flurl::{FlUrlResponse, HttpClientsCache};
+use flurl::FlUrlResponse;
 
 use serde_derive::{Deserialize, Serialize};
 
@@ -28,14 +28,12 @@ impl MyTimerTick for ServicesPinger {
             .sync_services_list(&settings_model.services)
             .await;
 
-        let clients_cache = Arc::new(HttpClientsCache::new());
-
         for (domain, services) in &settings_model.services {
             for service in services {
                 let app = self.app.clone();
                 let domain = domain.clone();
                 let service = service.clone();
-                tokio::spawn(ping_service(app, clients_cache.clone(), domain, service));
+                tokio::spawn(ping_service(app, domain, service));
             }
         }
     }
@@ -71,17 +69,11 @@ async fn get_ok_result(mut result: FlUrlResponse) -> Result<ServiceApiIsAliveMod
     Ok(model.unwrap())
 }
 
-async fn ping_service(
-    app: Arc<AppContext>,
-    clients_cache: Arc<HttpClientsCache>,
-    domain: String,
-    service: ServiceSettings,
-) {
+async fn ping_service(app: Arc<AppContext>, domain: String, service: ServiceSettings) {
     let mut sw = StopWatch::new();
     sw.start();
     let result = flurl::FlUrl::new(service.url.as_str())
         .set_timeout(Duration::from_secs(2))
-        .with_clients_cache(clients_cache)
         .get()
         .await;
 
