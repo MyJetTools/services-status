@@ -4,7 +4,7 @@ on:
     tags: "*"
 
 env:
-  IMAGE_NAME: myjettools/services-status
+  IMAGE_NAME: ghcr.io/myjettools/services-status
 
 jobs:
   build:
@@ -27,11 +27,8 @@ jobs:
       - run: cargo build --release
 
       - name: Docker login
-        env:
-          DOCKER_USER: ${{ secrets.DOCKER_USERNAME }}
-          DOCKER_PASS: ${{ secrets.DOCKER_PASSWORD }}
         run: |          
-          echo "$DOCKER_PASS" | docker login --username "$DOCKER_USER" --password-stdin   
+          echo "${{ secrets.PUBLISH_TOKEN }}" | docker login https://ghcr.io -u "${{ github.actor }}" --password-stdin   
       - name: Docker Build and Publish
         run: |          
           docker build -t ${IMAGE_NAME}:${{ steps.get_version.outputs.VERSION }} .
