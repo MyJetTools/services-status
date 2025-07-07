@@ -44,7 +44,10 @@ impl MyTimerTick for ServicesPinger {
         for socket in sockets {
             let mut unix_socket = path.clone();
             unix_socket.append_segment(&socket);
-            crate::scripts::ping_service(&self.app, unix_socket.to_string()).await;
+
+            let unix_socket = format!("http+unix:/{}", unix_socket.as_str());
+
+            let result = crate::scripts::ping_service(&self.app, unix_socket).await;
         }
     }
 }
