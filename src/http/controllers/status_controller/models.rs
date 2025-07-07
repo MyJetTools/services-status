@@ -7,7 +7,7 @@ use crate::{app_ctx::AppContext, services_list::ServiceDescription};
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ServicesStatusResponse {
-    pub services: BTreeMap<String, Vec<ServiceStatus>>,
+    pub services: BTreeMap<String, ServiceStatus>,
 }
 
 impl ServicesStatusResponse {
@@ -17,11 +17,7 @@ impl ServicesStatusResponse {
         let mut services = BTreeMap::new();
 
         for service in snapshot {
-            let mut group = Vec::with_capacity(services.len());
-
-            group.push(ServiceStatus::from(service.1));
-
-            services.insert(service.0, group);
+            services.insert(service.0, ServiceStatus::from(service.1));
         }
 
         Self { services }
