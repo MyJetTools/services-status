@@ -18,8 +18,9 @@ pub async fn ping_service(
 
     let body = fl_url.get_body_as_str().await.unwrap();
 
-    match serde_json::from_str(body) {
-        Ok(value) => value,
+    let result: Result<ServiceApiIsAliveModel, serde_json::Error> = serde_json::from_str(body);
+    match result {
+        Ok(value) => Ok(value),
         Err(err) => Err(format!(
             "Can not deserialize response from {}. Err: {:?}",
             unix_socket, err
