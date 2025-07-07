@@ -36,12 +36,17 @@ impl MyTimerTick for TelegramNotification {
 
         let now = DateTimeAsMicroseconds::now();
 
+        let env_info = self
+            .app
+            .settings_reader
+            .use_settings(|itm| itm.env.clone())
+            .await;
+
         for (_, services) in snapshot {
             for service in services {
                 let service_ok_duration = now.duration_since(service.last_ok_ping);
 
                 if service_ok_duration.as_positive_or_zero().as_secs() > 60 {
-                    let env_info = self.app.settings_reader.get_env_info().await;
                     errs.insert(service.app_name.clone(), ());
                     crate::telegram_api::send_message(
                         &telegram_settings,
@@ -59,7 +64,6 @@ impl MyTimerTick for TelegramNotification {
                     .await;
                 } else {
                     if let Some(_) = errs.remove(&service.app_name) {
-                        let env_info = self.app.settings_reader.get_env_info().await;
                         crate::telegram_api::send_message(
                             &telegram_settings,
                             env_info.as_str(),

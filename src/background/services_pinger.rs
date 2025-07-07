@@ -21,6 +21,7 @@ impl ServicesPinger {
 #[async_trait::async_trait]
 impl MyTimerTick for ServicesPinger {
     async fn tick(&self) {
+        /*
         let settings_model = self.app.settings_reader.get_settings().await;
 
         self.app
@@ -36,6 +37,9 @@ impl MyTimerTick for ServicesPinger {
                 tokio::spawn(ping_service(app, domain, service));
             }
         }
+         */
+
+        crate::scripts::get_sockets_list(&self.app).await;
     }
 }
 

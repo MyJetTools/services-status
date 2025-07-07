@@ -19,7 +19,7 @@ impl AppContext {
             app_states: Arc::new(AppStates::create_initialized()),
             services_list: ServicesList::new(),
             settings_reader,
-            process_id: uuid::Uuid::new_v4().to_string(),
+            process_id: rust_extensions::SortableId::generate().to_string(),
         }
     }
 }

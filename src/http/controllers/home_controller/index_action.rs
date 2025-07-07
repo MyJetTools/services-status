@@ -34,11 +34,9 @@ async fn handle_request(
         rnd = action.app.process_id
     );
 
-    HttpOutput::Content {
-        headers: None,
-        content_type: Some(WebContentType::Html),
-        content: content.into_bytes(),
-    }
-    .into_ok_result(true)
-    .into()
+    HttpOutput::from_builder()
+        .set_content_type(WebContentType::Html)
+        .build(content.into_bytes())
+        .into_ok_result(true)
+        .into()
 }

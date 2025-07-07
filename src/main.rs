@@ -7,6 +7,7 @@ use telegram_api::MessageType;
 mod app_ctx;
 mod background;
 mod http;
+mod scripts;
 mod services_list;
 mod settings;
 mod telegram_api;
@@ -24,7 +25,10 @@ async fn main() {
     let mut http_server = http::start_up::setup_server(&app, 8000);
 
     if let Some(telegram_settings) = app.settings_reader.get_telegram_settings().await {
-        let env_info = app.settings_reader.get_env_info().await;
+        let env_info = app
+            .settings_reader
+            .use_settings(|itm| itm.env.clone())
+            .await;
         telegram_api::send_message(
             &telegram_settings,
             &env_info,
@@ -59,7 +63,10 @@ async fn main() {
     app.app_states.wait_until_shutdown().await;
 
     if let Some(telegram_settings) = app.settings_reader.get_telegram_settings().await {
-        let env_info = app.settings_reader.get_env_info().await;
+        let env_info = app
+            .settings_reader
+            .use_settings(|itm| itm.env.clone())
+            .await;
         telegram_api::send_message(
             &telegram_settings,
             &env_info,
