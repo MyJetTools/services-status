@@ -1,8 +1,10 @@
 use std::os::unix::fs::FileTypeExt;
 
+use rust_extensions::file_utils::FilePath;
+
 use crate::app_ctx::AppContext;
 
-pub async fn get_sockets_list(app: &AppContext) -> Vec<String> {
+pub async fn get_sockets_list(app: &AppContext) -> (FilePath, Vec<String>) {
     let mut result = Vec::new();
     let path = app
         .settings_reader
@@ -20,15 +22,13 @@ pub async fn get_sockets_list(app: &AppContext) -> Vec<String> {
         let file_type = dir.file_type().await.unwrap();
 
         if file_type.is_socket() {
-            let mut path = path.clone();
             if let Some(name) = name.to_str() {
-                path.append_segment(name);
-                result.push(path.to_string());
+                result.push(name.to_string());
             }
         }
     }
 
     println!("{:#?}", result);
 
-    result
+    (path, result)
 }
