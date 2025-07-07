@@ -1,5 +1,3 @@
-use std::collections::BTreeMap;
-
 use rust_extensions::date_time::DateTimeAsMicroseconds;
 use serde::{Deserialize, Serialize};
 
@@ -7,20 +5,19 @@ use crate::{app_ctx::AppContext, services_list::ServiceDescription};
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ServicesStatusResponse {
-    pub services: BTreeMap<String, ServiceStatus>,
+    pub services: Vec<ServiceStatus>,
 }
 
 impl ServicesStatusResponse {
     pub async fn new(app: &AppContext) -> Self {
         let snapshot = app.services_list.get_snapshot().await;
 
-        let mut services = BTreeMap::new();
-
-        for service in snapshot {
-            services.insert(service.0, ServiceStatus::from(service.1));
+        Self {
+            services: snapshot
+                .into_iter()
+                .map(|service| ServiceStatus::from(service.1))
+                .collect(),
         }
-
-        Self { services }
     }
 }
 

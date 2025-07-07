@@ -5,7 +5,7 @@ use telegram_api::MessageType;
 use timers::{ServicesPinger, TelegramNotification};
 
 mod app_ctx;
-mod http;
+mod http_server;
 mod models;
 mod scripts;
 mod services_list;
@@ -23,7 +23,7 @@ async fn main() {
 
     let app = Arc::new(app);
 
-    let mut http_server = http::start_up::setup_server(&app, 8000);
+    let mut http_server = http_server::start_up::setup_server(&app, 8000);
 
     if let Some(telegram_settings) = app.settings_reader.get_telegram_settings().await {
         let env_info = app
