@@ -1,3 +1,5 @@
+use std::os::unix::fs::FileTypeExt;
+
 use crate::app_ctx::AppContext;
 
 pub async fn get_sockets_list(app: &AppContext) -> Vec<String> {
@@ -16,8 +18,17 @@ pub async fn get_sockets_list(app: &AppContext) -> Vec<String> {
     while let Some(dir) = read_dir.next_entry().await.unwrap() {
         let name = dir.file_name();
         let file_type = dir.file_type().await.unwrap();
-        println!("Name {:?} has File Type: {:?}", name.as_os_str(), file_type);
+
+        if file_type.is_socket() {
+            let mut path = path.clone();
+            if let Some(name) = name.to_str() {
+                path.append_segment(name);
+                result.push(path.to_string());
+            }
+        }
     }
+
+    println!("{:#?}", result);
 
     result
 }
