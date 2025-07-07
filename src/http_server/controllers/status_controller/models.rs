@@ -5,11 +5,17 @@ use crate::{app_ctx::AppContext, services_list::ServiceDescription};
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ServicesStatusResponse {
+    pub env: String,
+    pub vm: String,
     pub services: Vec<ServiceStatus>,
 }
 
 impl ServicesStatusResponse {
     pub async fn new(app: &AppContext) -> Self {
+        let (env, vm) = app
+            .settings_reader
+            .use_settings(|settings| (settings.env.to_string(), settings.vm.to_string()))
+            .await;
         let snapshot = app.services_list.get_snapshot().await;
 
         Self {
@@ -17,6 +23,8 @@ impl ServicesStatusResponse {
                 .into_iter()
                 .map(|service| ServiceStatus::from(service.1))
                 .collect(),
+            env,
+            vm,
         }
     }
 }
