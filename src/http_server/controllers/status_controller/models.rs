@@ -34,7 +34,7 @@ pub struct ServiceStatus {
     pub id: String,
     pub name: String,
     pub version: String,
-    pub compiled_at: String,
+    pub compiled_at: Option<String>,
     pub last_ok: Option<usize>,
     pub last_error: Option<String>,
     pub last_ping_duration: String,
@@ -56,12 +56,19 @@ impl ServiceStatus {
             None
         };
 
+        let compiled_at = src.compiled.map(|mut dt| {
+            while dt.len() > 19 {
+                dt.pop();
+            }
+            dt
+        });
+
         Self {
             id: src.id,
             name: src.app_name,
             version: src.app_version,
 
-            compiled_at: src.compiled.unwrap_or_else(|| "".to_string()),
+            compiled_at,
             last_ok,
             last_error: src.last_error,
             last_ping_duration: format!("{:?}", src.last_ping_duration),
