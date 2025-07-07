@@ -38,7 +38,7 @@ pub struct ServiceStatus {
     pub last_ok: Option<usize>,
     pub last_error: Option<String>,
     pub last_ping_duration: String,
-    pub started: Option<i64>,
+    pub started: Option<String>,
 }
 
 impl ServiceStatus {
@@ -65,7 +65,14 @@ impl ServiceStatus {
             last_ok,
             last_error: src.last_error,
             last_ping_duration: format!("{:?}", src.last_ping_duration),
-            started: src.started,
+            started: src.started.map(|itm| {
+                let mut result = DateTimeAsMicroseconds::new(itm).to_rfc3339();
+
+                while result.len() > 19 {
+                    result.pop();
+                }
+                result
+            }),
         }
     }
 }
