@@ -7,7 +7,6 @@ use crate::models::ServiceApiIsAliveModel;
 #[derive(Debug, Clone)]
 pub struct ServiceDescription {
     pub id: String,
-
     pub compiled: Option<String>,
     pub last_ok_ping: Option<DateTimeAsMicroseconds>,
     pub last_error: Option<String>,

@@ -12,10 +12,6 @@ pub struct ServicesStatusResponse {
 
 impl ServicesStatusResponse {
     pub async fn new(app: &AppContext) -> Self {
-        let env_info = app
-            .settings_reader
-            .use_settings(|itm| itm.env.to_string())
-            .await;
         let snapshot = app.services_list.get_snapshot().await;
 
         let mut services = BTreeMap::new();
@@ -23,7 +19,7 @@ impl ServicesStatusResponse {
         for service in snapshot {
             let mut group = Vec::with_capacity(services.len());
 
-            group.push(ServiceStatus::from(service.1, &env_info));
+            group.push(ServiceStatus::from(service.1));
 
             services.insert(service.0, group);
         }
@@ -37,21 +33,15 @@ pub struct ServiceStatus {
     pub id: String,
     pub name: String,
     pub version: String,
-    #[serde(rename = "compiledAt")]
     pub compiled_at: String,
-    #[serde(rename = "lastOk")]
     pub last_ok: Option<usize>,
-    #[serde(rename = "lastError")]
     pub last_error: Option<String>,
-    #[serde(rename = "lastPingDuration")]
     pub last_ping_duration: String,
-    #[serde(rename = "envInfo")]
-    pub env_info: String,
     pub started: Option<i64>,
 }
 
 impl ServiceStatus {
-    pub fn from(src: ServiceDescription, env_info: &str) -> Self {
+    pub fn from(src: ServiceDescription) -> Self {
         let now = DateTimeAsMicroseconds::now();
 
         let last_ok = if let Some(last_ok_ping) = src.last_ok_ping {
@@ -74,7 +64,6 @@ impl ServiceStatus {
             last_ok,
             last_error: src.last_error,
             last_ping_duration: format!("{:?}", src.last_ping_duration),
-            env_info: env_info.to_string(),
             started: src.started,
         }
     }
