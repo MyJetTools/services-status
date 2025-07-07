@@ -14,7 +14,7 @@ mod telegram_api;
 
 #[tokio::main]
 async fn main() {
-    let settings_reader = crate::settings::SettingsReader::new(".services-status").await;
+    let settings_reader = crate::settings::SettingsReader::new("~/.services-status").await;
 
     let settings_reader = Arc::new(settings_reader);
 
