@@ -42,40 +42,39 @@ impl MyTimerTick for TelegramNotification {
             .use_settings(|itm| itm.env.clone())
             .await;
 
-        for (_, services) in snapshot {
-            for service in services {
-                let service_ok_duration = now.duration_since(service.last_ok_ping);
+        for service in snapshot.values() {
+            let service_ok_duration = if let Some(last_ok_ping) = service.last_ok_ping {
+                now.duration_since(last_ok_ping).get_full_seconds()
+            } else {
+                0
+            };
 
-                if service_ok_duration.as_positive_or_zero().as_secs() > 60 {
-                    errs.insert(service.app_name.clone(), ());
+            if service_ok_duration > 60 {
+                errs.insert(service.app_name.clone(), ());
+                crate::telegram_api::send_message(
+                    &telegram_settings,
+                    env_info.as_str(),
+                    MessageType::ServiceIsDown,
+                    format!(
+                        "[{}]. Service {}:{} is not ok for {} seconds",
+                        service.id, service.app_name, service.app_version, service_ok_duration
+                    )
+                    .as_str(),
+                )
+                .await;
+            } else {
+                if let Some(_) = errs.remove(&service.app_name) {
                     crate::telegram_api::send_message(
                         &telegram_settings,
                         env_info.as_str(),
-                        MessageType::ServiceIsDown,
+                        MessageType::ServiceIsUp,
                         format!(
-                            "[{}]. Service {}:{} is not ok for {} seconds",
-                            service.id,
-                            service.app_name,
-                            service.app_version,
-                            service_ok_duration.as_positive_or_zero().as_secs()
+                            "Service {}:{} is ok now",
+                            service.app_name, service.app_version
                         )
                         .as_str(),
                     )
                     .await;
-                } else {
-                    if let Some(_) = errs.remove(&service.app_name) {
-                        crate::telegram_api::send_message(
-                            &telegram_settings,
-                            env_info.as_str(),
-                            MessageType::ServiceIsUp,
-                            format!(
-                                "Service {}:{} is ok now",
-                                service.app_name, service.app_version
-                            )
-                            .as_str(),
-                        )
-                        .await;
-                    }
                 }
             }
         }

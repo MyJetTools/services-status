@@ -1,27 +1,28 @@
-use flurl::FlUrl;
-use rust_extensions::StopWatch;
+use std::time::Duration;
 
-use crate::app_ctx::AppContext;
+use flurl::FlUrl;
+
+use crate::{app_ctx::AppContext, models::ServiceApiIsAliveModel};
 
 pub async fn ping_service(
     _app: &AppContext,
     unix_socket: String,
-) -> Result<PingServiceResult, String> {
-    let sw = StopWatch::new();
-    let mut fl_url = FlUrl::new(unix_socket)
+) -> Result<ServiceApiIsAliveModel, String> {
+    let mut fl_url = FlUrl::new(unix_socket.as_str())
         .append_path_segment("api")
         .append_path_segment("isalive")
+        .set_timeout(Duration::from_secs(3))
         .get()
         .await
         .unwrap();
 
-    let duration = sw.duration();
-
     let body = fl_url.get_body_as_str().await.unwrap();
 
-    println!("[{:?}] {}", duration, body);
-
-    Ok(PingServiceResult {})
+    match serde_json::from_str(body) {
+        Ok(value) => value,
+        Err(err) => Err(format!(
+            "Can not deserialize response from {}. Err: {:?}",
+            unix_socket, err
+        )),
+    }
 }
-
-pub struct PingServiceResult {}

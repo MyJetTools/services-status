@@ -1,16 +1,17 @@
 use std::{sync::Arc, time::Duration};
 
-use background::{ServicesPinger, TelegramNotification};
 use rust_extensions::MyTimer;
 use telegram_api::MessageType;
+use timers::{ServicesPinger, TelegramNotification};
 
 mod app_ctx;
-mod background;
 mod http;
+mod models;
 mod scripts;
 mod services_list;
 mod settings;
 mod telegram_api;
+mod timers;
 
 #[tokio::main]
 async fn main() {
