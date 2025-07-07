@@ -37,6 +37,7 @@ impl MyTimerTick for ServicesPinger {
                 }
 
                 Err(err) => {
+                    println!("{} Err: {}", socket, err);
                     self.app
                         .services_list
                         .update_error(socket, err, sw.duration())

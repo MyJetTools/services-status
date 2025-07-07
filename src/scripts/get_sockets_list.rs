@@ -28,7 +28,5 @@ pub async fn get_sockets_list(app: &AppContext) -> (FilePath, Vec<String>) {
         }
     }
 
-    println!("{:#?}", result);
-
     (path, result)
 }
